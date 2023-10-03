@@ -1,24 +1,23 @@
 const path = require("path");
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
+require("dotenv").config();
 
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
-const MONGODB_URI =
-  "your mongo db uri";
-
 const app = express();
-const store = new MongoDBStore({
-  uri: MONGODB_URI,
-  collection: "sessions",
+const MONGODB_URI = process.env.MONGODB_URI;
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
 });
+
 const csrfProtection = csrf();
 
 app.set("view engine", "ejs");
@@ -35,7 +34,6 @@ app.use(
     secret: "my secret",
     resave: false,
     saveUninitialized: false,
-    store: store,
   })
 );
 app.use(csrfProtection);
